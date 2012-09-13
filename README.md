@@ -6,7 +6,3 @@ I was inspired by a lot of previous extensions that all were out of date.  This 
 
 One last thing: you should know that the formatting options for Google Chrome Developer Tool's Console are very few.  I've done my best to format information nicely, but it's not perfect.  Please don't expect an exact copy of FirePHP from Firefox.  (For example, Chrome doesn't support console.table() output, so I have to make my own).
 
-Known Issues/todos:
--better table formatting
--support needed for Exception, Trace, group_start, group_end, dump
-
