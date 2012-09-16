@@ -33,16 +33,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
  */
 const LOGGER = function(json) {
 	var commandObject = JSON.parse(unescape(json));
-	if (commandObject.type == 'table') {
-		console['info'].apply(console, commandObject.table);
-	}
-	else {
-		var params = [commandObject.message];
-		if (commandObject.fileAndLine) {
-			params.push(commandObject.fileAndLine);
-		}
-		console[commandObject.type].apply(console, params);
-	}
+	console[commandObject.type].apply(console, commandObject.params);
 }
 
 /** 

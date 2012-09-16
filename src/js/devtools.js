@@ -46,37 +46,45 @@ FirePHP4Chrome.buildCommandObject = function(name, value) {
 		var logArray = JSON.parse(parts[1]);
 		var metaObject = logArray[0];
 		var headerType = metaObject.Type.toLowerCase();
-		
+
 		/**
-		 * only log,info, warn, error and table are implmented, others will result in commandObject remaining null
+		 * here we either log the plain item, or fake it to be an info
 		 */
 		switch (headerType) {
 			case 'log':
 			case 'info':
 			case 'warn':
 			case 'error':
-				/**
-				 * add in the file/line to make it easier to reference where this error came from
-				 */
+				var params = [logArray[1]];
+				if (metaObject.Label) {
+					params.unshift(metaObject.Label);
+				}
 				commandObject = {
 						type: headerType,
-						message: logArray[1],
-						fileAndLine: metaObject.File + ":" + metaObject.Line
+						params: params
 				};
+				if (metaObject.File) {
+					commandObject.params.push(metaObject.File + ":" + metaObject.Line);
+				}
 				break;
+				
 			case 'table':
 				/**
-				 * need to build a pretty table - first line is normal, all the rest are indented one spot
-				 * and its not fully justified
+				 * no built in functionality for table - so this gets it pretty enough.
+				 * tables probably have a label mostly, so use that as the first row, otherwise just call it a table
 				 */
-				var table = ["Table:"];
+				var tableLabel = "Table";
+				if (metaObject.Label) {
+					tableLabel = metaObject.Label;
+				}
+				var table = [tableLabel];
 				for (var i = 0; i < logArray[1].length; i++) {
 					table.push("\n");
 					table.push(logArray[1][i]);
 				}
 				commandObject = {
-					type: "table",
-					table: table
+					type: "info",
+					params: table
 				};
 				break;
 		}

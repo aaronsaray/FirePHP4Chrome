@@ -1,6 +1,6 @@
 {
   "name": "FirePHP4Chrome",
-  "version": "0.1",
+  "version": "0.2",
   "manifest_version": 2,
   "description": "Show FirePHP log messages in the Chrome Developer Console",
   "devtools_page": "html/devtools.html",
@@ -13,5 +13,5 @@
     "https://*/*"
   ],
   "icons": { "128": "images/icon_128.png" },
-  "minimum_chrome_version": "18"
+  "minimum_chrome_version": "21"
 }
