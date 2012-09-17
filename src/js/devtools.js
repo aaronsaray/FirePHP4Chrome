@@ -95,13 +95,11 @@ FirePHP4Chrome.buildCommandObject = function(name, value) {
 				/**
 				 * trace is much more complex of an object - get the top level item, then loop through it's traces and add to the array
 				 */
+				if (message.Message) {
+					params.push(message.Message); //this was from the trace when it was executed
+				}
 				if (params.length == 0) {
-					if (message.Message) {
-						params.push(message.Message); //this was from the trace when it was executed
-					}
-					else {
-						params.push('Stack Trace'); // rarely should this happen, but in case there is a trace with no message or label
-					}
+					params.push('Stack Trace'); // rarely should this happen, but in case there is a trace with no message or label
 				}
 
 				params.push("\n"); //formatting makes it clearer to understand the order in the console
@@ -114,6 +112,32 @@ FirePHP4Chrome.buildCommandObject = function(name, value) {
 				commandObject = {
 						type: 'log',
 						params: params
+				};
+				break;
+				
+			case 'exception':
+				/**
+				 * exception is very similar to trace - because it contains a trace in it. but note that the topmost
+				 * object isn't matching of a trace - like how the main stack trace one does - this object is slightly different
+				 * and so it has to be created properly. (like the Message is part of this first object instead of being a label/message)
+				 */
+				var exceptionObject = {
+						Message: message.Message,
+						Class: message.Class,
+						File: message.File,
+						Line: message.Line
+				};
+				params.push("Exception:\n");
+				params.push(exceptionObject);
+				params.push("\nStack trace:\n");
+				for (var i = 0; i < message.Trace.length; i++) {
+					params.push("\n");
+					params.push(FirePHP4Chrome.buildTraceObject(message.Trace[i]));
+				}
+
+				commandObject = {
+					type: 'log',
+					params: params
 				};
 				break;
 		}
@@ -129,13 +153,20 @@ FirePHP4Chrome.buildCommandObject = function(name, value) {
  * versions of this but they all ended up more complicated and longer in length
  */
 FirePHP4Chrome.buildTraceObject = function(originalTraceObject) {
-	return {
+	var traceObject = {
 			Class: (originalTraceObject.Class ? originalTraceObject.Class : originalTraceObject.class),
 			Method: (originalTraceObject.Function ? originalTraceObject.Function : originalTraceObject.function),
-			Parameters: (originalTraceObject.Args ? originalTraceObject.Args : originalTraceObject.args),
 			File: (originalTraceObject.File ? originalTraceObject.File : originalTraceObject.file),
-			Line: originalTraceObject.Line
+			Line: (originalTraceObject.Line ? originalTraceObject.Line : originalTraceObject.line)
 	};
+	
+	/** sometimes parameter is empty, depending on your code **/
+	var parameters = (originalTraceObject.Args ? originalTraceObject.Args : originalTraceObject.args);
+	if (parameters.length) {
+		traceObject.Parameters = parameters;
+	}
+
+	return traceObject;
 };
 
 /**
