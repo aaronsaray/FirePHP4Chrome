@@ -44,8 +44,22 @@ FirePHP4Chrome.buildCommandObject = function(name, value) {
 	if (/^X-Wf-1-1-1-/.test(name)) {
 		var parts = value.split('|');
 		var logArray = JSON.parse(parts[1]);
-		var metaObject = logArray[0];
-		var message = logArray[1];
+		
+		/** this little section could probably be refactored into a strategy pattern or something later on to retreive the commandObject **/
+		if (typeof logArray[0] === "undefined") {
+			//note: on dump, you always have an object of a unknown key (which is hte label) and the payload - which can be any datatype
+			// that's why this code is like this.
+			var label = Object.keys(logArray).pop();
+			var message = logArray[label];
+			var metaObject = {
+					Type: "log",
+					Label: label
+			};
+		}
+		else {
+			var metaObject = logArray[0];
+			var message = logArray[1];	
+		}
 		var headerType = metaObject.Type.toLowerCase();
 		
 		/** add in the label because its the same for all - table will add 'table' in if this is blank **/
@@ -72,7 +86,7 @@ FirePHP4Chrome.buildCommandObject = function(name, value) {
 					commandObject.params.push(metaObject.File + ":" + metaObject.Line);
 				}
 				break;
-				
+
 			case 'table':
 				/**
 				 * no built in functionality for table - so this gets it pretty enough.
