@@ -45,20 +45,25 @@ FirePHP4Chrome.buildCommandObject = function(name, value) {
 		var parts = value.split('|');
 		var logArray = JSON.parse(parts[1]);
 		var metaObject = logArray[0];
+		var message = logArray[1];
 		var headerType = metaObject.Type.toLowerCase();
-
+		
+		/** add in the label because its the same for all - table will add 'table' in if this is blank **/
+		var params = [];
+		if (metaObject.Label) {
+			params.push(metaObject.Label);
+		}
+		
 		/**
 		 * here we either log the plain item, or fake it to be an info
 		 */
 		switch (headerType) {
+			case 'debug':
 			case 'log':
 			case 'info':
 			case 'warn':
 			case 'error':
-				var params = [logArray[1]];
-				if (metaObject.Label) {
-					params.unshift(metaObject.Label);
-				}
+				params.push(message);
 				commandObject = {
 						type: headerType,
 						params: params
@@ -73,24 +78,64 @@ FirePHP4Chrome.buildCommandObject = function(name, value) {
 				 * no built in functionality for table - so this gets it pretty enough.
 				 * tables probably have a label mostly, so use that as the first row, otherwise just call it a table
 				 */
-				var tableLabel = "Table";
-				if (metaObject.Label) {
-					tableLabel = metaObject.Label;
+				if (params.length == 0) {
+					params.push('Table'); // add the label if there was no label
 				}
-				var table = [tableLabel];
-				for (var i = 0; i < logArray[1].length; i++) {
-					table.push("\n");
-					table.push(logArray[1][i]);
+				for (var i = 0; i < message.length; i++) {
+					params.push("\n");
+					params.push(message[i]);
 				}
 				commandObject = {
 					type: "info",
-					params: table
+					params: params
+				};
+				break;
+				
+			case 'trace':
+				/**
+				 * trace is much more complex of an object - get the top level item, then loop through it's traces and add to the array
+				 */
+				if (params.length == 0) {
+					if (message.Message) {
+						params.push(message.Message); //this was from the trace when it was executed
+					}
+					else {
+						params.push('Stack Trace'); // rarely should this happen, but in case there is a trace with no message or label
+					}
+				}
+
+				params.push("\n"); //formatting makes it clearer to understand the order in the console
+				params.push(FirePHP4Chrome.buildTraceObject(message));
+				for (var i = 0; i < message.Trace.length; i++) {
+					params.push("\n");
+					params.push(FirePHP4Chrome.buildTraceObject(message.Trace[i]));
+				}
+				
+				commandObject = {
+						type: 'log',
+						params: params
 				};
 				break;
 		}
 	}
 	
 	return commandObject;
+};
+
+/**
+ * create an object from the header that can be easily logged for traces
+ * note: rebuilding these objects instead of just slicing/parsing, so that the order of the properties is always predictable
+ * fun fact: in the parent, all properties are capital, all children are lowercase. - I tried making less code-repetition
+ * versions of this but they all ended up more complicated and longer in length
+ */
+FirePHP4Chrome.buildTraceObject = function(originalTraceObject) {
+	return {
+			Class: (originalTraceObject.Class ? originalTraceObject.Class : originalTraceObject.class),
+			Method: (originalTraceObject.Function ? originalTraceObject.Function : originalTraceObject.function),
+			Parameters: (originalTraceObject.Args ? originalTraceObject.Args : originalTraceObject.args),
+			File: (originalTraceObject.File ? originalTraceObject.File : originalTraceObject.file),
+			Line: originalTraceObject.Line
+	};
 };
 
 /**
