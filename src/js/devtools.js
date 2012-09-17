@@ -42,24 +42,10 @@ FirePHP4Chrome.buildCommandObject = function(name, value) {
 	
 	/** means its an actual message-able item **/
 	if (/^X-Wf-1-1-1-/.test(name)) {
-		var parts = value.split('|');
-		var logArray = JSON.parse(parts[1]);
+		var parsedHeaderResponse = FirePHP4Chrome.parseHeaderForResponse(value);
+		var metaObject = parsedHeaderResponse.metaObject;
+		var message = parsedHeaderResponse.message;
 		
-		/** this little section could probably be refactored into a strategy pattern or something later on to retreive the commandObject **/
-		if (typeof logArray[0] === "undefined") {
-			//note: on dump, you always have an object of a unknown key (which is hte label) and the payload - which can be any datatype
-			// that's why this code is like this.
-			var label = Object.keys(logArray).pop();
-			var message = logArray[label];
-			var metaObject = {
-					Type: "log",
-					Label: label
-			};
-		}
-		else {
-			var metaObject = logArray[0];
-			var message = logArray[1];	
-		}
 		var headerType = metaObject.Type.toLowerCase();
 		
 		/** add in the label because its the same for all - table will add 'table' in if this is blank **/
@@ -86,7 +72,33 @@ FirePHP4Chrome.buildCommandObject = function(name, value) {
 					commandObject.params.push(metaObject.File + ":" + metaObject.Line);
 				}
 				break;
-
+		
+			case 'group_start':
+			case 'group':
+			case 'group_collapsed':
+				/**
+				 * chrome supports group or collapsed group.  Headers come through as underscore, group, or group start
+				 */
+				var consoleGroupCommand = (headerType == 'group_collapsed' ? 'groupCollapsed' : 'group');
+				params.push(message); 
+				commandObject = {
+						type: consoleGroupCommand,
+						params: params
+				}
+				break;
+			
+			case 'groupend':
+			case 'group_end':
+				/**
+				 * ending is either with a camel case (strtolowere'd here) or underscore
+				 */
+				params.push(message); 
+				commandObject = {
+						type: 'groupEnd',
+						params: params
+				}
+				break;				
+				
 			case 'table':
 				/**
 				 * no built in functionality for table - so this gets it pretty enough.
@@ -161,6 +173,36 @@ FirePHP4Chrome.buildCommandObject = function(name, value) {
 };
 
 /**
+ * This method parses out the values from the header that was matched as a wildfire header and a 1-1-1 property
+ * It will send back an object with message and metaObject keys.
+ * 
+ */
+FirePHP4Chrome.parseHeaderForResponse = function(value) {
+	var parts = value.split('|');
+	var logArray = JSON.parse(parts[1]);
+	
+	if (typeof logArray[0] === "undefined") {
+		//note: on dump, you always have an object of a unknown key (which is hte label) and the payload - which can be any datatype
+		// that's why this code is like this.
+		var label = Object.keys(logArray).pop();
+		var message = logArray[label];
+		var metaObject = {
+				Type: "log",
+				Label: label
+		};
+	}
+	else {
+		var metaObject = logArray[0];
+		var message = logArray[1];	
+	}
+
+	return {
+		metaObject: metaObject,
+		message: message
+	}
+};
+
+/**
  * create an object from the header that can be easily logged for traces
  * note: rebuilding these objects instead of just slicing/parsing, so that the order of the properties is always predictable
  * fun fact: in the parent, all properties are capital, all children are lowercase. - I tried making less code-repetition
@@ -190,13 +232,20 @@ chrome.devtools.network.onRequestFinished.addListener(
 	function(request) {
 		var wfHeaders = FirePHP4Chrome.getWildfireHeaders(request);
 		if (FirePHP4Chrome.isProperProtocol(wfHeaders)) {
-			for (var name in wfHeaders) {
+			
+			/** sort them properly  - then loop through the sorted version **/
+			var keys = Object.keys(wfHeaders);
+			keys.sort();
+			var name = '';
+			for (var i = 0; i < keys.length; i++) {
+				name = keys[i];
 				var commandObject = FirePHP4Chrome.buildCommandObject(name, wfHeaders[name]);
 				
 				/** escape and then json encode the command to be sent to the other scripts **/
 				if (commandObject) {
 					chrome.extension.sendMessage(escape(JSON.stringify(commandObject)));
 				}
+				
 			}
 		}
 	}	
