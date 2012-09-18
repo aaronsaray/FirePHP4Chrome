@@ -7,9 +7,9 @@
  * - has the inline script
  * 
  * Special notes: This extension was inspired by Google samples and other chrome FirePHP scripts, 
- * none of them worked.
+ * none of them worked. :(
  * 
- * @author me@aaronsaray.com
+ * @author Aaron Saray aarone@aaronsaray.com
  */
 
 /**
@@ -31,10 +31,11 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 /**
  * Code used to inject inline.  into the current page to run
  */
-const LOGGER = function(json) {
-	var commandObject = JSON.parse(unescape(json));
-	console[commandObject.type].apply(console, commandObject.params);
-}
+const LOGGER;
+LOGGER = function (json) {
+    var commandObject = JSON.parse(unescape(json));
+    console[commandObject.type].apply(console, commandObject.params);
+};
 
 /** 
  * messages come from devtools in the form of an object with a type of console log an a message to send
@@ -44,7 +45,7 @@ chrome.extension.onMessage.addListener(
 	function(commandObject) {
 		//inject LOGGER code and pass argument of our escaped stringified object
 		chrome.tabs.executeScript(null, {
-			 code: "("+ LOGGER + ")('" + commandObject + "');",
+			 code: "("+ LOGGER + ")('" + commandObject + "');"
 		});
 	}	
 );
