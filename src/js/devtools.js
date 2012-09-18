@@ -304,10 +304,10 @@ function FirePHP4Chrome() {
  * on each completed request, check the HAR entry for our lovely headers
  */
 chrome.devtools.network.onRequestFinished.addListener(
-	function(request) {
-		var client = new FirePHP4Chrome();
-		client.processHeaders(request);
-	}
+    function(request) {
+        var client = new FirePHP4Chrome();
+        client.processHeaders(request);
+    }
 );
 
 /**
