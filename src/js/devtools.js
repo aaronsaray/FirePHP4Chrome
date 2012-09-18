@@ -305,8 +305,8 @@ function FirePHP4Chrome() {
  */
 chrome.devtools.network.onRequestFinished.addListener(
 	function(request) {
-        var client = new FirePHP4Chrome();
-        client.processHeaders(request);
+		var client = new FirePHP4Chrome();
+		client.processHeaders(request);
 	}
 );
 
