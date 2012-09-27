@@ -31,8 +31,8 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 /**
  * Code used to inject inline.  into the current page to run
  */
-const LOGGER;
-LOGGER = function (json) {
+
+const LOGGER = function (json) {
     var commandObject = JSON.parse(unescape(json));
     console[commandObject.type].apply(console, commandObject.params);
 };
