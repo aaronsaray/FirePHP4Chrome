@@ -8,6 +8,9 @@ One last thing: you should know that the formatting options for Google Chrome De
 
 Changelog:
 
+0.3
+Added multi-header messages (Thanks https://github.com/kuebk for the suggestions and the permission to refactor)
+
 0.2
 Added support for dump, trace, exception, groups
 Some code refactoring - smaller footprint when code is inserted directly to the page

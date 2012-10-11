@@ -17,22 +17,30 @@ function FirePHP4Chrome() {
      * This method is used to determine if there are any firePHP Headers in here, and if so, send messages to background.js
      * @param request is a HAR entry
      */
-    this.processHeaders = function(request) {
+    this.processHeaders = function(request) {	
         var wfHeaders = _getWildfireHeaders(request);
         if (_isProperProtocol(wfHeaders)) {
-            /** sort them properly  - then loop through the sorted version **/
-            var keys = Object.keys(wfHeaders);
-            keys.sort();
-            var name = '';
-            for (var i = 0; i < keys.length; i++) {
-                name = keys[i];
-                var commandObject = _buildCommandObject(name, wfHeaders[name]);
-
-                /** if not null - meaning we found something to be actionable on **/
-                if (commandObject) {
-                    _sendCommandObject(commandObject);
-                }
-            }
+        	var sortedHeaders = _getSortedMessageHeaders(wfHeaders);
+        	
+        	/**
+        	 * now loop through and build objects from these results
+        	 * remember to combine multi line ones
+        	 */
+        	var headerValue = '';
+        	for (var i = 0; i < sortedHeaders.length; i++) {
+        		var currentHeader = sortedHeaders[i].replace(/^\d*\|/, '');
+        		var parts = currentHeader.split('|');
+        		headerValue += parts[0];
+        		if (parts[1] == '\\') {
+        			/** its multipart so get next part **/
+        			continue;
+        		}
+        		var commandObject = _buildCommandObject(headerValue);
+        		if (commandObject) {
+        			_sendCommandObject(commandObject);
+        		}
+        		headerValue = '';
+        	}
         }
     };
 
@@ -78,6 +86,26 @@ function FirePHP4Chrome() {
     };
 
     /**
+     * This works with all known wildfire headers, and sorts all of the message headers numerically
+     * 
+     * @param wfHeaders an object of headers matching wildfire specifications
+     * @return {array} headers in proper order to be either messaged or combined
+     */
+    var _getSortedMessageHeaders = function(wfHeaders) {
+    	/** we can't guarantee the order of any headers, so they need to be sorted properly **/
+    	var sortedHeaders = [];
+    	for (var key in wfHeaders) {
+    		if (/^X-Wf-1-1-1-/.test(key)) {
+    			/** new key is minus one because our array needs to start at 0 for JS to sort it properly **/
+    			var newKey = parseFloat(key.replace('X-Wf-1-1-1-', '')) - 1;
+    			sortedHeaders[newKey] = wfHeaders[key];
+    		}
+    	}
+    	sortedHeaders.sort();
+    	return sortedHeaders;
+    }
+
+    /**
      * Determines if the header that we're receiving is of the proper protocol (0.2)
      *
      * @return boolean
@@ -91,145 +119,142 @@ function FirePHP4Chrome() {
     /**
      * Build the commandObject object that is sent to the messenger
      *
-     * This takes headers that we know are wildfire headers, checks to see if they're just meta information or
-     * something that we can message, and then builds the proper commandObject from them.  This method is where
+     * This takes a header string formatted from a request that has been either singular 
+     * or combined from multiple headers and then builds the proper commandObject from them.  This method is where
      * it determines if its log, warn, table, etc.
      *
-     * @param name the name of the header
      * @param value the value of the header
      * @private
      * @return {Object} the special commandObject with properties of type, and params
      */
-    var _buildCommandObject = function(name, value) {
+    var _buildCommandObject = function(value) {
         var commandObject = null;
 
-        /** means its an actual message-able item **/
-        if (/^X-Wf-1-1-1-/.test(name)) {
-            var parsedHeaderResponse = _parseHeaderForResponse(value);
-            var metaObject = parsedHeaderResponse.metaObject;
-            var message = parsedHeaderResponse.message;
+        var parsedHeaderResponse = _parseHeaderForResponse(value);
+        
+        var metaObject = parsedHeaderResponse.metaObject;
+        var message = parsedHeaderResponse.message;
 
-            var headerType = metaObject.Type.toLowerCase();
+        var headerType = metaObject.Type.toLowerCase();
 
-            /** add in the label because its the same for all - table will add 'table' in if this is blank **/
-            var params = [];
-            if (metaObject.Label) {
-                params.push(metaObject.Label);
-            }
+        /** add in the label because its the same for all - table will add 'table' in if this is blank **/
+        var params = [];
+        if (metaObject.Label) {
+            params.push(metaObject.Label);
+        }
 
-            /**
-             * here we either log the plain item, or fake it to be an info
-             */
-            switch (headerType) {
-                case 'debug':
-                case 'log':
-                case 'info':
-                case 'warn':
-                case 'error':
-                    params.push(message);
-                    commandObject = {
-                        type: headerType,
-                        params: params
-                    };
-                    if (metaObject.File) {
-                        commandObject.params.push(metaObject.File + ":" + metaObject.Line);
-                    }
-                    break;
+        /**
+         * here we either log the plain item, or fake it to be an info
+         */
+        switch (headerType) {
+            case 'debug':
+            case 'log':
+            case 'info':
+            case 'warn':
+            case 'error':
+                params.push(message);
+                commandObject = {
+                    type: headerType,
+                    params: params
+                };
+                if (metaObject.File) {
+                    commandObject.params.push(metaObject.File + ":" + metaObject.Line);
+                }
+                break;
 
-                case 'group_start':
-                case 'group':
-                case 'group_collapsed':
-                    /**
-                     * chrome supports group or collapsed group.  Headers come through as underscore, group, or group start
-                     */
-                    var consoleGroupCommand = (headerType == 'group_collapsed' ? 'groupCollapsed' : 'group');
-                    params.push(message);
-                    commandObject = {
-                        type: consoleGroupCommand,
-                        params: params
-                    }
-                    break;
+            case 'group_start':
+            case 'group':
+            case 'group_collapsed':
+                /**
+                 * chrome supports group or collapsed group.  Headers come through as underscore, group, or group start
+                 */
+                var consoleGroupCommand = (headerType == 'group_collapsed' ? 'groupCollapsed' : 'group');
+                params.push(message);
+                commandObject = {
+                    type: consoleGroupCommand,
+                    params: params
+                }
+                break;
 
-                case 'groupend':
-                case 'group_end':
-                    /**
-                     * ending is either with a camel case (strtolowere'd here) or underscore
-                     */
-                    params.push(message);
-                    commandObject = {
-                        type: 'groupEnd',
-                        params: params
-                    }
-                    break;
+            case 'groupend':
+            case 'group_end':
+                /**
+                 * ending is either with a camel case (strtolowere'd here) or underscore
+                 */
+                params.push(message);
+                commandObject = {
+                    type: 'groupEnd',
+                    params: params
+                }
+                break;
 
-                case 'table':
-                    /**
-                     * no built in functionality for table - so this gets it pretty enough.
-                     * tables probably have a label mostly, so use that as the first row, otherwise just call it a table
-                     */
-                    if (params.length == 0) {
-                        params.push('Table'); // add the label if there was no label
-                    }
-                    for (var i = 0; i < message.length; i++) {
-                        params.push("\n");
-                        params.push(message[i]);
-                    }
-                    commandObject = {
-                        type: "info",
-                        params: params
-                    };
-                    break;
+            case 'table':
+                /**
+                 * no built in functionality for table - so this gets it pretty enough.
+                 * tables probably have a label mostly, so use that as the first row, otherwise just call it a table
+                 */
+                if (params.length == 0) {
+                    params.push('Table'); // add the label if there was no label
+                }
+                for (var i = 0; i < message.length; i++) {
+                    params.push("\n");
+                    params.push(message[i]);
+                }
+                commandObject = {
+                    type: "info",
+                    params: params
+                };
+                break;
 
-                case 'trace':
-                    /**
-                     * trace is much more complex of an object - get the top level item, then loop through it's traces and add to the array
-                     */
-                    if (message.Message) {
-                        params.push(message.Message); //this was from the trace when it was executed
-                    }
-                    if (params.length == 0) {
-                        params.push('Stack Trace'); // rarely should this happen, but in case there is a trace with no message or label
-                    }
+            case 'trace':
+                /**
+                 * trace is much more complex of an object - get the top level item, then loop through it's traces and add to the array
+                 */
+                if (message.Message) {
+                    params.push(message.Message); //this was from the trace when it was executed
+                }
+                if (params.length == 0) {
+                    params.push('Stack Trace'); // rarely should this happen, but in case there is a trace with no message or label
+                }
 
-                    params.push("\n"); //formatting makes it clearer to understand the order in the console
-                    params.push(_buildTraceObject(message));
-                    for (var i = 0; i < message.Trace.length; i++) {
-                        params.push("\n");
-                        params.push(_buildTraceObject(message.Trace[i]));
-                    }
+                params.push("\n"); //formatting makes it clearer to understand the order in the console
+                params.push(_buildTraceObject(message));
+                for (var i = 0; i < message.Trace.length; i++) {
+                    params.push("\n");
+                    params.push(_buildTraceObject(message.Trace[i]));
+                }
 
-                    commandObject = {
-                        type: 'log',
-                        params: params
-                    };
-                    break;
+                commandObject = {
+                    type: 'log',
+                    params: params
+                };
+                break;
 
-                case 'exception':
-                    /**
-                     * exception is very similar to trace - because it contains a trace in it. but note that the topmost
-                     * object isn't matching of a trace - like how the main stack trace one does - this object is slightly different
-                     * and so it has to be created properly. (like the Message is part of this first object instead of being a label/message)
-                     */
-                    var exceptionObject = {
-                        Message: message.Message,
-                        Class: message.Class,
-                        File: message.File,
-                        Line: message.Line
-                    };
-                    params.push("Exception:\n");
-                    params.push(exceptionObject);
-                    params.push("\nStack trace:\n");
-                    for (var i = 0; i < message.Trace.length; i++) {
-                        params.push("\n");
-                        params.push(_buildTraceObject(message.Trace[i]));
-                    }
+            case 'exception':
+                /**
+                 * exception is very similar to trace - because it contains a trace in it. but note that the topmost
+                 * object isn't matching of a trace - like how the main stack trace one does - this object is slightly different
+                 * and so it has to be created properly. (like the Message is part of this first object instead of being a label/message)
+                 */
+                var exceptionObject = {
+                    Message: message.Message,
+                    Class: message.Class,
+                    File: message.File,
+                    Line: message.Line
+                };
+                params.push("Exception:\n");
+                params.push(exceptionObject);
+                params.push("\nStack trace:\n");
+                for (var i = 0; i < message.Trace.length; i++) {
+                    params.push("\n");
+                    params.push(_buildTraceObject(message.Trace[i]));
+                }
 
-                    commandObject = {
-                        type: 'log',
-                        params: params
-                    };
-                    break;
-            }
+                commandObject = {
+                    type: 'log',
+                    params: params
+                };
+                break;
         }
 
         return commandObject;
@@ -238,16 +263,15 @@ function FirePHP4Chrome() {
     /**
      * parses out the values from the header that are needed to build a command object.
      *
-     * the x-wf-1-1-1-# headers have a proprietary format that need to be parsed and then prepped for commandObject
+     * the x-wf-1-1-1-# headers have a proprietary format that need to be parsed and then prepped for commandObject,
+     * note - this can be a combined value from multiple x-wf-1-1-1-# headers if the message was large
      *
      * @param value the value of the header
      * @private
      * @return {Object} the processed information with properties of the metaObject and the message
      */
     var _parseHeaderForResponse = function(value) {
-        var parts = value.split('|');
-        var logArray = JSON.parse(parts[1]);
-
+        var logArray = JSON.parse(value);
         if (typeof logArray[0] === "undefined") {
             /**
              * on dump, you always have an object of a unknown key (which is the label) and the payload -
