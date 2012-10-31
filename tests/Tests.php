@@ -22,7 +22,14 @@ class Tests implements \Iterator
 		'LogMessage',
 		'InfoMessage',
 		'WarnMessage',
-		'ErrorMessage'
+		'ErrorMessage',
+		'ExceptionAsError',
+		'GroupExpanded',
+		'GroupCollapsed',
+		'Table',
+		'Trace',
+		'MultipleHeadersProperOrder',
+		'MultilineHeaderMessage'
 	);
 
 	/**
@@ -39,8 +46,137 @@ class Tests implements \Iterator
 	 */
 	protected function _testLogMessage()
 	{
+		\FB::log('This is a log message with no label');
+		\FB::log('This is a log message with a label', 'Here is the label');
 
+		$providerData = $this->_provideItemsForLogging();
+		\FB::log($providerData['array'], 'this is the label to an array');
+		\FB::log($providerData['object'], 'this is the label for the object');
 	}
+
+	/**
+	 * Test for sending info message
+	 */
+	protected function _testInfoMessage()
+	{
+		\FB::info('This is an info message with no label');
+		\FB::info('This is an info message with a label', 'this is the label');
+
+		$providerData = $this->_provideItemsForLogging();
+		\FB::info($providerData['array'], 'this is the label to an array');
+		\FB::info($providerData['object'], 'this is the label for the object');
+	}
+
+	/**
+	 * Used to test warn messages
+	 */
+	protected function _testWarnMessage()
+	{
+		\FB::warn('This is a warn message with no label');
+		\FB::warn('This is a warn message with a label', 'here is the label');
+
+		$providerData = $this->_provideItemsForLogging();
+		\FB::warn($providerData['array'], 'this is the label to an array');
+		\FB::warn($providerData['object'], 'this is the label for the object');
+	}
+
+	/**
+	 * Tests error messages
+	 */
+	protected function _testErrorMessage()
+	{
+		\FB::error('This is an error message with no label');
+		\FB::error('This is an error message with a label', 'this is the label');
+
+		$providerData = $this->_provideItemsForLogging();
+		\FB::error($providerData['array'], 'this is the label to an array');
+		\FB::error($providerData['object'], 'this is the label for the object');
+	}
+
+	/**
+	 * Throw an exception, and then catch it, and send it to the error handler
+	 */
+	protected function _testExceptionAsError()
+	{
+		try {
+			throw new \Exception('This is my test exception message.');
+		}
+		catch (\Exception $e) {
+			\FB::error($e);
+			\FB::error($e, 'This is the label');
+		}
+	}
+
+	/**
+	 * tests the expanded group
+	 */
+	protected function _testGroupExpanded()
+	{
+		\FB::group('Group start');
+		\FB::info('here is something to be grouped');
+		\FB::info('here is more to be grouped');
+		\FB::groupEnd();
+	}
+
+	/**
+	 * tests the collapsed group
+	 */
+	protected function _testGroupCollapsed()
+	{
+		\FB::group('Group start of collapsed', array('Collapsed'=>true));
+		\FB::info('here is something to be grouped');
+		\FB::info('here is more to be grouped');
+		\FB::groupEnd();
+	}
+
+	/**
+	 * Tests the table display
+	 */
+	protected function _testTable()
+	{
+		$table = array();
+		$table[] = array('column 1', 'column2', 'column 3');
+		$table[] = array('1x1', '1x2', '1x3');
+		$table[] = array('2x1', '2x2', '2x3');
+		$table[] = array('3x1', '3x2', '3x3');
+
+		\FB::table('Table label is here', $table);
+	}
+
+	/**
+	 * Tests the output of the trace command
+	 */
+	protected function _testTrace()
+	{
+		\FB::trace('this is the label of the trace');
+	}
+
+	/**
+	 * test a lot of headers to make sure that the ordering is working properly
+	 */
+	protected function _testMultipleHeadersProperOrder()
+	{
+		$counter = range(1, 22);
+		foreach ($counter as $key) {
+			\FB::info("This is header #{$key}");
+		}
+	}
+
+	/**
+	 * used to test messages that require multiple headers to make one message
+	 */
+	protected function _testMultilineHeaderMessage()
+	{
+		$item = array_fill(0, 600, array());
+		foreach ($item as $key=> &$array) {
+			$array["{$key} test string"] = md5(uniqid());
+		}
+		\FB::log($item);
+	}
+
+	/**********************************************************
+	 * end of test functions
+	 *********************************************************/
 
 	/**
 	 * Runs the test based on the passed in ID
@@ -60,13 +196,25 @@ class Tests implements \Iterator
 			throw new \Exception("This class does not contain the method: [{$methodName}]");
 		}
 
-
+		require 'FirePHPCore/fb.php';
 
 		$this->$methodName();
 
 		return "Ran test: {$this->_tests[$id]}";
 	}
 
+	/**
+	 * This method returns items for testing for the various logging methods
+	 *
+	 * @return array items for testing
+	 */
+	protected function _provideItemsForLogging()
+	{
+		$array = range(1,5);
+		$object = new \stdClass;
+		$object->meaningOfLife = 42;
+		return array('array'=>$array, 'object'=>$object);
+	}
 
 
 
