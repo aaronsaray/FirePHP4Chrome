@@ -18,6 +18,11 @@
  */
 chrome.webRequest.onBeforeSendHeaders.addListener(
 	function(details) {
+		for (var i = 0; i < details.requestHeaders.length; i++) {
+			if (details.requestHeaders[i].name == 'User-Agent') {
+				details.requestHeaders[i].value += ' FirePHP/4Chrome'; // required for old ZF and other libs (matches the regex)
+			}
+		}
 		details.requestHeaders.push({
 			name:	'X-FirePHP-Version',
 			value:	'0.0.6'

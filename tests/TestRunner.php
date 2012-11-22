@@ -26,7 +26,6 @@
 			<p>
 				<strong>Known issues:</strong>
 				<ul>
-					<li>Test the necessity of some frameworks needing the user agent modified (like older ZFs)</li>
 				    <li>Validate that multi-line header of TRACE will display properly (should be based on proper sorting fixed above though)</li>
 				</ul>
 			</p>

@@ -9,7 +9,7 @@ One last thing: you should know that the formatting options for Google Chrome De
 Changelog:
 
 0.4
-Fixed bugs regarding random orders.  Validated information on FirePHP limitations
+Fixed bugs regarding random orders.  Validated information on FirePHP limitations. Added user agent modification to deal with old frameworks.
 
 0.3
 Added multi-header messages (Thanks https://github.com/kuebk for the suggestions and the permission to refactor)
