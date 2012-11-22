@@ -23,12 +23,6 @@
 			<h1>Test Runner for FirePHP4Chrome</h1>
 			<p>Choose one of the following tests.</p>
 			<p><em>Please remember to open up the Developer tools panel first!</em></p>
-			<p>
-				<strong>Known issues:</strong>
-				<ul>
-				    <li>Validate that multi-line header of TRACE will display properly (should be based on proper sorting fixed above though)</li>
-				</ul>
-			</p>
 			<hr>
 			<?php
 				require 'Tests.php';
