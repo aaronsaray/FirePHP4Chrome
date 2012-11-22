@@ -26,12 +26,8 @@
 			<p>
 				<strong>Known issues:</strong>
 				<ul>
-					<li>Tests using the logging of object/array seem to be in the wrong order</li>
-					<li>Setting an array with a non-numeric key makes firephp4chrome report as an object - is it chrome or firephp that sends this?</li>
-					<li>Multi header test does not make any console item show up.</li>
 					<li>Test the necessity of some frameworks needing the user agent modified (like older ZFs)</li>
 				    <li>Validate that multi-line header of TRACE will display properly (should be based on proper sorting fixed above though)</li>
-					<li>Investigate if logging of an object type of class can be logged by chrome, or if it requires it to be an 'object' with a classname property</li>
 				</ul>
 			</p>
 			<hr>

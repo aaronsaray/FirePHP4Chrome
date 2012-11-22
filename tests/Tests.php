@@ -211,6 +211,7 @@ class Tests implements \Iterator
 	protected function _provideItemsForLogging()
 	{
 		$array = range(1,5);
+		$array = array('hi there'=>'my guy');
 		$object = new \stdClass;
 		$object->meaningOfLife = 42;
 		return array('array'=>$array, 'object'=>$object);
@@ -262,3 +263,4 @@ class Tests implements \Iterator
 		return isset($this->_tests[$this->_iteratorKey]);
 	}
 }
+

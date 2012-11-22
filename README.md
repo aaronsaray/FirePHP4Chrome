@@ -4,9 +4,12 @@ The Developer Tools for Google Chrome are pretty great - but something was missi
 
 I was inspired by a lot of previous extensions that all were out of date.  This even includes Google's own sample extension!  This extension is all fresh code using the most recent Google APIs - and doesn't require experimental mode to be activated!
 
-One last thing: you should know that the formatting options for Google Chrome Developer Tool's Console are very few.  I've done my best to format information nicely, but it's not perfect.  Please don't expect an exact copy of FirePHP from Firefox.  (For example, Chrome doesn't support console.table() output, so I have to make my own).
+One last thing: you should know that the formatting options for Google Chrome Developer Tool's Console are very few.  I've done my best to format information nicely, but it's not perfect.  Please don't expect an exact copy of FirePHP from Firefox.  (For example, Chrome doesn't support console.table() output, so I have to make my own - and logging array's with non numeric keys get sent as objects from FirePHP).
 
 Changelog:
+
+0.4
+Fixed bugs regarding random orders.  Validated information on FirePHP limitations
 
 0.3
 Added multi-header messages (Thanks https://github.com/kuebk for the suggestions and the permission to refactor)
