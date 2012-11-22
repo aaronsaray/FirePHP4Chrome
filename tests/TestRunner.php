@@ -26,8 +26,6 @@
 			<p>
 				<strong>Known issues:</strong>
 				<ul>
-					<li>Group expanded does not put the one entry inside of the content</li>
-					<li>Group collapsed seems to put both items outside of the group, and still is expanded</li>
 					<li>Tests using the logging of object/array seem to be in the wrong order</li>
 					<li>Setting an array with a non-numeric key makes firephp4chrome report as an object - is it chrome or firephp that sends this?</li>
 					<li>Multi header test does not make any console item show up.</li>

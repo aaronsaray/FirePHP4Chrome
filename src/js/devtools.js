@@ -97,11 +97,10 @@ function FirePHP4Chrome() {
     	for (var key in wfHeaders) {
     		if (/^X-Wf-1-1-1-/.test(key)) {
     			/** new key is minus one because our array needs to start at 0 for JS to sort it properly **/
-    			var newKey = parseFloat(key.replace('X-Wf-1-1-1-', '')) - 1;
+    			var newKey = parseInt(key.replace('X-Wf-1-1-1-', '')) - 1;
     			sortedHeaders[newKey] = wfHeaders[key];
     		}
     	}
-    	sortedHeaders.sort();
     	return sortedHeaders;
     }
 
@@ -166,9 +165,19 @@ function FirePHP4Chrome() {
             case 'group':
             case 'group_collapsed':
                 /**
-                 * chrome supports group or collapsed group.  Headers come through as underscore, group, or group start
+                 * chrome supports group or collapsed group.  Headers come through as underscore, group, or group start in some versions of the library
                  */
                 var consoleGroupCommand = (headerType == 'group_collapsed' ? 'groupCollapsed' : 'group');
+
+	            /**
+	             * in other libraries, it sends a collapsed = true header
+	             */
+	            if (metaObject.Collapsed) {
+		            if (metaObject.Collapsed == 'true') {
+			            consoleGroupCommand = 'groupCollapsed';
+		            }
+	            }
+
                 params.push(message);
                 commandObject = {
                     type: consoleGroupCommand,
