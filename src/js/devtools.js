@@ -77,8 +77,8 @@ function FirePHP4Chrome() {
         /** go through all headers on this request **/
         for (var i = 0; i < headers.length; i++) {
             /** if it matches wildfire, add it to the object **/
-            if (/^X-Wf-/.test(headers[i].name)) {
-                wfHeaders[headers[i].name] =  headers[i].value;
+            if (/^X-Wf-/i.test(headers[i].name)) {
+                wfHeaders[headers[i].name.toLowerCase()] =  headers[i].value;
             }
         };
 
@@ -95,9 +95,9 @@ function FirePHP4Chrome() {
     	/** we can't guarantee the order of any headers, so they need to be sorted properly **/
     	var sortedHeaders = [];
     	for (var key in wfHeaders) {
-    		if (/^X-Wf-1-1-1-/.test(key)) {
+    		if (/^x-wf-1-1-1-/.test(key)) {
     			/** new key is minus one because our array needs to start at 0 for JS to sort it properly **/
-    			var newKey = parseInt(key.replace('X-Wf-1-1-1-', '')) - 1;
+    			var newKey = parseInt(key.replace('x-wf-1-1-1-', '')) - 1;
     			sortedHeaders[newKey] = wfHeaders[key];
     		}
     	}
@@ -112,7 +112,7 @@ function FirePHP4Chrome() {
      * @private
      */
     var _isProperProtocol = function(headerObject) {
-        return headerObject['X-Wf-Protocol-1'] == 'http://meta.wildfirehq.org/Protocol/JsonStream/0.2';
+        return headerObject['x-wf-protocol-1'] == 'http://meta.wildfirehq.org/Protocol/JsonStream/0.2';
     };
 
     /**
