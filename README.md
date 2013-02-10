@@ -7,6 +7,8 @@ I was inspired by a lot of previous extensions that all were out of date.  This 
 One last thing: you should know that the formatting options for Google Chrome Developer Tool's Console are very few.  I've done my best to format information nicely, but it's not perfect.  Please don't expect an exact copy of FirePHP from Firefox.  (For example, Chrome doesn't support console.table() output, so I have to make my own - and logging array's with non numeric keys get sent as objects from FirePHP).
 
 Changelog:
+0.5
+Support for mixed case header names (from pull request).
 
 0.4
 Fixed bugs regarding random orders.  Validated information on FirePHP limitations. Added user agent modification to deal with old frameworks.
