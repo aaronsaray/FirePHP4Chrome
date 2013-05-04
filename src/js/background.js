@@ -27,6 +27,10 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 			name:	'X-FirePHP-Version',
 			value:	'0.0.6'
 		});
+		details.requestHeaders.push({
+			name:	'X-FirePHP-MaxCombinedHeaderSize',
+			value:	'256'
+		});
 		return {
 			requestHeaders: details.requestHeaders
 		};
