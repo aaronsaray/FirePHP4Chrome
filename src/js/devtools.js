@@ -136,9 +136,9 @@ function FirePHP4Chrome() {
 
         var headerType = metaObject.Type.toLowerCase();
 
-        /** add in the label because its the same for all - table will add 'table' in if this is blank **/
+        /** add in the label because its the same for all except for table **/
         var params = [];
-        if (metaObject.Label) {
+        if (headerType != 'table' && metaObject.Label) {
             params.push(metaObject.Label);
         }
 
@@ -190,6 +190,7 @@ function FirePHP4Chrome() {
                 /**
                  * ending is either with a camel case (strtolowere'd here) or underscore
                  */
+
                 params.push(message);
                 commandObject = {
                     type: 'groupEnd',
@@ -198,21 +199,38 @@ function FirePHP4Chrome() {
                 break;
 
             case 'table':
-                /**
-                 * no built in functionality for table - so this gets it pretty enough.
-                 * tables probably have a label mostly, so use that as the first row, otherwise just call it a table
-                 */
-                if (params.length == 0) {
-                    params.push('Table'); // add the label if there was no label
-                }
-                for (var i = 0; i < message.length; i++) {
-                    params.push("\n");
-                    params.push(message[i]);
-                }
-                commandObject = {
-                    type: "info",
-                    params: params
-                };
+	            if (console.table) {
+		            /**
+		             * to get proper headers, you need to build an object to pass
+		             */
+		            var columns = message.shift();
+		            var table = [];
+		            for (var i = 0; i < message.length; i++) {
+			            var row = {};
+			            for (j = 0; j < message[i].length; j++) {
+				            row[columns[j]] = message[i][j];
+			            }
+			            table.push(row);
+		            }
+		            params.push(table);
+		            commandObject = {
+			            type: "table",
+			            params: params
+		            };
+	            }
+	            else {
+		            /**
+		             * no built in functionality for table (not using canary?) - so this gets it pretty enough.
+		             */
+		            for (var i = 0; i < message.length; i++) {
+			            params.push("\n");
+			            params.push(message[i]);
+		            }
+		            commandObject = {
+			            type: "info",
+			            params: params
+		            };
+	            }
                 break;
 
             case 'trace':
