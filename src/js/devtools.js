@@ -17,7 +17,7 @@ function FirePHP4Chrome() {
      * This method is used to determine if there are any firePHP Headers in here, and if so, send messages to background.js
      * @param request is a HAR entry
      */
-    this.processHeaders = function(request) {	
+    this.processHeaders = function(request) {
         var wfHeaders = _getWildfireHeaders(request);
         if (_isProperProtocol(wfHeaders)) {
         	var sortedHeaders = _getSortedMessageHeaders(wfHeaders);
@@ -220,6 +220,17 @@ function FirePHP4Chrome() {
                 break;
 
             case 'table':
+	            /**
+	             * For table, you can send a label - but that never actually is an 'option' for a table according to
+	             * the documentation I found.  So, if there is a label, I'll make it an info before
+	             *
+	             * This is a little bit different than normal as I'm going to send another command object in the middle
+	             * of building one.  In the future, might refactor to return multiple commandObjects in this case
+	             */
+	            if (metaObject.Label) {
+		            _sendCommandObject({type:'info', params: [metaObject.Label]});
+	            }
+
 	            if (console.table) {
 		            /**
 		             * to get proper headers, you need to build an object to pass

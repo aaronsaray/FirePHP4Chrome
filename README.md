@@ -8,8 +8,11 @@ One last thing: you should know that the formatting options for Google Chrome De
 
 # Changelog
 
+#### 0.8
+Adding in table label - using info() if label is sent because console.table() does not support label.
+
 #### 0.7
-Support for planned header size limit in FirePHP (to handle the Chrome issue of too large headers).
+Support for planned header size limit in FirePHP (to handle the Chrome issue of too large headers - with hopes it comes out and magically works.)
 
 #### 0.6
 Support for console.table() (in canary or better - still backwards compatible for older versions). (Thanks https://github.com/niutech for the heads up)
