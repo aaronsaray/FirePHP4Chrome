@@ -8,6 +8,9 @@ One last thing: you should know that the formatting options for Google Chrome De
 
 # Changelog
 
+#### 0.7
+Support for planned header size limit in FirePHP (to handle the Chrome issue of too large headers).
+
 #### 0.6
 Support for console.table() (in canary or better - still backwards compatible for older versions). (Thanks https://github.com/niutech for the heads up)
 

@@ -9,11 +9,11 @@
  * Special notes: This extension was inspired by Google samples and other chrome FirePHP scripts, 
  * none of them worked. :(
  * 
- * @author Aaron Saray aarone@aaronsaray.com
+ * @author Aaron Saray aaron@aaronsaray.com
  */
 
 /**
- * On header send, add in the header for FirePHP
+ * On header send, add in the header for FirePHP and 256k limit for chrome header size
  * note: it has to go here, not in devtools.js because devtools only gets called when you show it
  */
 chrome.webRequest.onBeforeSendHeaders.addListener(
@@ -26,7 +26,11 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 		details.requestHeaders.push({
 			name:	'X-FirePHP-Version',
 			value:	'0.0.6'
-		});
+		},
+        {
+			name:   'X-Wf-Max-Combined-Size',
+	        value:  '262144'
+        });
 		return {
 			requestHeaders: details.requestHeaders
 		};

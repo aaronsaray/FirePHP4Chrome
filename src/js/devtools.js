@@ -21,8 +21,8 @@ function FirePHP4Chrome() {
         var wfHeaders = _getWildfireHeaders(request);
         if (_isProperProtocol(wfHeaders)) {
         	var sortedHeaders = _getSortedMessageHeaders(wfHeaders);
-        	
-        	/**
+
+	        /**
         	 * now loop through and build objects from these results
         	 * remember to combine multi line ones
         	 */
@@ -41,6 +41,17 @@ function FirePHP4Chrome() {
         		}
         		headerValue = '';
         	}
+
+	        /** handle truncated message **/
+	        if (_isTruncatedResponse(wfHeaders)) {
+		        var bytes = wfHeaders['x-wf-notify-truncated']; //note: the final format has not yet been defined for this
+		        var commandObject = {
+			        type: "info",
+			        params: ["FirePHP has truncated headers for Chrome.  Truncated bytes: " + bytes]
+		        };
+		        _sendCommandObject(commandObject);
+	        }
+
         }
     };
 
@@ -108,12 +119,22 @@ function FirePHP4Chrome() {
      * Determines if the header that we're receiving is of the proper protocol (0.2)
      *
      * @return boolean
-     * @param param
      * @private
+     * @param headerObject
      */
     var _isProperProtocol = function(headerObject) {
         return headerObject['x-wf-protocol-1'] == 'http://meta.wildfirehq.org/Protocol/JsonStream/0.2';
     };
+
+	/**
+	 * Determines if there is a truncated alert
+	 * @param wfHeaders
+	 * @returns {boolean}
+	 * @private
+	 */
+	var _isTruncatedResponse = function(wfHeaders) {
+		return wfHeaders['x-wf-notify-truncated'] != undefined;
+	};
 
     /**
      * Build the commandObject object that is sent to the messenger
