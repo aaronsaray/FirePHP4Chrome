@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>FirePHP4Chrome Options</title>
+    <style>
+        body {
+            font-family: tahoma, verdana, arial, sans-serif;
+            color: #444;
+            background: #ccc;
+            font-size: 75%;
+        }
+        input, textarea {
+            border: 3px solid #ccc;
+        }
+        textarea {
+            width: 100%
+        }
+        label {
+            font-weight: bold;
+        }
+        button {
+            cursor: pointer;
+            color: #444;
+        }
+        hr {
+            border-style: solid;
+            color: #ffcece;
+            margin: 10px auto;
+        }
+        dd {
+            margin: 5px 0;
+        }
+        button:hover {
+            color: #000;
+        }
+        .success {
+            background: #7f7;
+            border-color: #5f5;
+            -webkit-transition: opacity 4s ease-in;
+            opacity: 0;
+        }
+        .failure {
+            background: #f77;
+            border-color: #f55;
+        }
+        .help {
+            font-style: italic;
+            color: #999;
+        }
+        #container {
+            width: 600px;
+            margin: auto;
+            border: 1px solid #aaa;
+            padding: 20px;
+            background: #f4f4f4;
+        }
+        #container h1 {
+            margin-top: 0px;
+            display: inline-block;
+        }
+        #logo {
+            height: 64px;
+            vertical-align: bottom;
+            margin-right: 20px;
+        }
+        #savemessage {
+            display: inline-block;
+            margin-left: 14px;
+            padding: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <img src="../images/icon_128.png" alt="logo" id="logo"><h1>FirePHP4Chrome Options</h1>
+        <p>The following settings are used to modify the behavior of this extension.</p>
+        <p>Please click <strong>save</strong> when you have finished updating your settings.</p>
+        <hr>
+        <dl>
+            <dt><label for="blacklist">Domains to disable FirePHP4Chrome on:</label></dt>
+            <dd><textarea id="blacklist"></textarea></dd>
+            <dd><span class="help">Please comma separate the list of domains.  Do not include protocol, wildcards or paths.</span></dd>
+        </dl>
+        <div>
+            <button id="submit">Save</button><span id="savemessage"></span>
+        </div>
+    </div>
+    <script src="../js/options.js"></script>
+</body>
+</html>
