@@ -16,7 +16,7 @@ function FirePHP4Chrome_Options() {
      * Validation messages
      */
     var _messages = {
-        success: 'Options saved successfully.'
+        success: 'Options saved successfully.  Reloading in 5 seconds.'
     };
 
     /**
@@ -33,7 +33,7 @@ function FirePHP4Chrome_Options() {
      * @private
      */
     var _defaultOptions = {
-        blacklist: 'www.yellowpages.com'
+        blacklist: '*://www.yellowpages.com/*'
     };
 
     /**
@@ -54,7 +54,7 @@ function FirePHP4Chrome_Options() {
         };
 
         chrome.storage.sync.set({'options': options}, function () {
-            _updateStatus(_messages.success, _messageTypes.success);
+            _updateStatusAndReload(_messages.success, _messageTypes.success);
         });
     };
 
@@ -62,17 +62,19 @@ function FirePHP4Chrome_Options() {
      * Used to update message / status
      *
      * Adds a transition to it too
+     * Finally reloads the extension
      * @param message
      * @param type
      * @private
      */
-    var _updateStatus = function(message, type) {
+    var _updateStatusAndReload = function(message, type) {
         var status = document.querySelector('#savemessage');
         status.innerText = message;
         status.className = type;
         setTimeout(function(){
             status.className = '';
             status.innerText = '';
+            chrome.runtime.reload(); // because options are used in background page
         }, 5000);
     };
 

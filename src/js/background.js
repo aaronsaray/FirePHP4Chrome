@@ -13,24 +13,53 @@
  */
 
 /**
+* set up a quick namespace as not to pollute
+*/
+var FirePHP4Chrome_NS = FirePHP4Chrome_NS || {};
+
+/**
+ * Define to send headers
+ */
+FirePHP4Chrome_NS.addHeaders = true;
+
+/**
+ * get options, then add a listener once i've got them
+ */
+chrome.storage.sync.get('options', function(settings) {
+    if (settings.options) {
+        if (settings.options.blacklist) {
+            var blacklist = settings.options.blacklist.replace(/\s+/, '').split(',');
+            chrome.webRequest.onBeforeRequest.addListener(
+                function() {
+                    FirePHP4Chrome_NS.addHeaders = false;
+                }, {urls: blacklist}, ['blocking']
+            );
+        }
+    }
+});
+
+/**
  * On header send, add in the header for FirePHP and 256k limit for chrome header size
  * note: it has to go here, not in devtools.js because devtools only gets called when you show it
  */
 chrome.webRequest.onBeforeSendHeaders.addListener(
 	function(details) {
-		for (var i = 0; i < details.requestHeaders.length; i++) {
-			if (details.requestHeaders[i].name == 'User-Agent') {
-				details.requestHeaders[i].value += ' FirePHP/4Chrome'; // required for old ZF and other libs (matches the regex)
-			}
-		}
-		details.requestHeaders.push({
-			name:	'X-FirePHP-Version',
-			value:	'0.0.6'
-		},
-        {
-			name:   'X-Wf-Max-Combined-Size',
-	        value:  '262144'
-        });
+        if (FirePHP4Chrome_NS.addHeaders) {
+            for (var i = 0; i < details.requestHeaders.length; i++) {
+                if (details.requestHeaders[i].name == 'User-Agent') {
+                    details.requestHeaders[i].value += ' FirePHP/4Chrome'; // required for old ZF and other libs (matches the regex)
+                }
+            }
+            details.requestHeaders.push({
+                    name:	'X-FirePHP-Version',
+                    value:	'0.0.6'
+                },
+                {
+                    name:   'X-Wf-Max-Combined-Size',
+                    value:  '262144'
+                });
+        }
+
 		return {
 			requestHeaders: details.requestHeaders
 		};
