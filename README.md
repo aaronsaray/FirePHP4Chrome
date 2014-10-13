@@ -8,6 +8,9 @@ One last thing: you should know that the formatting options for Google Chrome De
 
 # Changelog
 
+#### 0.9
+Added a blacklist url pattern match.  You can now go in options and use google's pattern matching syntax to blacklist domains.  I added www.yellowpages.com as that was the reason for the issue. (Thanks https://github.com/davidcroda for your report.)
+
 #### 0.8
 Adding in table label - using info() if label is sent because console.table() does not support label.
 
