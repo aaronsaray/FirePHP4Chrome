@@ -23,6 +23,11 @@ var FirePHP4Chrome_NS = FirePHP4Chrome_NS || {};
 FirePHP4Chrome_NS.addHeaders = true;
 
 /**
+ * Max combined header size
+ */
+FirePHP4Chrome_NS.maxCombinedSize = 261120;
+
+/**
  * get options, then add a listener once i've got them
  */
 chrome.storage.sync.get('options', function(settings) {
@@ -34,6 +39,9 @@ chrome.storage.sync.get('options', function(settings) {
                     FirePHP4Chrome_NS.addHeaders = false;
                 }, {urls: blacklist}, ['blocking']
             );
+        }
+        if (settings.options.maxCombinedSize) {
+            FirePHP4Chrome_NS.maxCombinedSize = settings.options.maxCombinedSize;
         }
     }
 });
@@ -56,8 +64,10 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
                 },
                 {
                     name:   'X-Wf-Max-Combined-Size',
-                    value:  '262144'
+                    value:  FirePHP4Chrome_NS.maxCombinedSize+''
                 });
+            
+            console.log(details.requestHeaders);
         }
 
 		return {
