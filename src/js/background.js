@@ -66,8 +66,6 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
                     name:   'X-Wf-Max-Combined-Size',
                     value:  FirePHP4Chrome_NS.maxCombinedSize+''
                 });
-            
-            console.log(details.requestHeaders);
         }
 
 		return {
