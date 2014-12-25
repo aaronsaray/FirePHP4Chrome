@@ -6,6 +6,8 @@ I was inspired by a lot of previous extensions that all were out of date.  This 
 
 One last thing: you should know that the formatting options for Google Chrome Developer Tool's Console are still in development.  I've done my best to format information nicely, but it's not perfect.  Please don't expect an exact copy of FirePHP from Firefox.
 
+Sick of reading and just want to install this? Go get it from the Chrome Webstore: https://chrome.google.com/webstore/detail/firephp4chrome/gpgbmonepdpnacijbbdijfbecmgoojma
+
 # Changelog
 
 #### 0.10
