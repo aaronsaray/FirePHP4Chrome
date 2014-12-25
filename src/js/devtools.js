@@ -27,8 +27,9 @@ function FirePHP4Chrome() {
         	 * remember to combine multi line ones
         	 */
         	var headerValue = '';
+            var digitRegexReplace = /^\d*\|/;
         	for (var i = 0; i < sortedHeaders.length; i++) {
-        		var currentHeader = sortedHeaders[i].replace(/^\d*\|/, '');
+        		var currentHeader = sortedHeaders[i].replace(digitRegexReplace, '');
         		var parts = currentHeader.split('|');
         		headerValue += parts[0];
         		if (parts[1] == '\\') {
@@ -86,9 +87,10 @@ function FirePHP4Chrome() {
         var headers = HAR.response.headers, wfHeaders = {};
 
         /** go through all headers on this request **/
+        var wildfireHeaderBeginRegex = /^X-Wf-/i;
         for (var i = 0; i < headers.length; i++) {
             /** if it matches wildfire, add it to the object **/
-            if (/^X-Wf-/i.test(headers[i].name)) {
+            if (wildfireHeaderBeginRegex.test(headers[i].name)) {
                 wfHeaders[headers[i].name.toLowerCase()] =  headers[i].value;
             }
         };
@@ -105,8 +107,9 @@ function FirePHP4Chrome() {
     var _getSortedMessageHeaders = function(wfHeaders) {
     	/** we can't guarantee the order of any headers, so they need to be sorted properly **/
     	var sortedHeaders = [];
+        var wildfireHeaderBeginRegex = /^x-wf-1-1-1-/;
     	for (var key in wfHeaders) {
-    		if (/^x-wf-1-1-1-/.test(key)) {
+    		if (wildfireHeaderBeginRegex.test(key)) {
     			/** new key is minus one because our array needs to start at 0 for JS to sort it properly **/
     			var newKey = parseInt(key.replace('x-wf-1-1-1-', '')) - 1;
     			sortedHeaders[newKey] = wfHeaders[key];
