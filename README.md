@@ -8,6 +8,9 @@ One last thing: you should know that the formatting options for Google Chrome De
 
 # Changelog
 
+#### 0.10
+Merged in PR to add setting for max header size to be sent dynamically (Thanks https://github.com/GodLesZ)
+
 #### 0.9
 Added a blacklist url pattern match.  You can now go in options and use google's pattern matching syntax to blacklist domains.  I added www.yellowpages.com as that was the reason for the issue. (Thanks https://github.com/davidcroda for your report.)
 
