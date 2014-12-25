@@ -83,9 +83,10 @@
             <dd><span class="help">Please comma separate the list.  For reference on patterns, see <a href="https://developer.chrome.com/extensions/match_patterns" target="_blank">URL Pattern Matches</a>.</span></dd>
         </dl>
 		<dl>
-			<dt><label for="max_combined_size">Maximum combined header size:</label></dt>
+			<dt><label for="max_combined_size">Maximum combined header size (in bytes):</label></dt>
             <dd><input type="text" value="" id="max_combined_size" /></dd>
-		</dl>
+            <dd><span class="help">Chrome has a high-level of 256kb for header size, see <a href="https://github.com/firephp/firephp-core/issues/10" target="_blank">Github issue for firephp-core</a>.</span></dd>
+        </dl>
         <div>
             <button id="submit">Save</button><span id="savemessage"></span>
         </div>
