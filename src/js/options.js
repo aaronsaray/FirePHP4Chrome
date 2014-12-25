@@ -33,7 +33,8 @@ function FirePHP4Chrome_Options() {
      * @private
      */
     var _defaultOptions = {
-        blacklist: '*://www.yellowpages.com/*'
+        blacklist: '*://www.yellowpages.com/*',
+        maxCombinedSize: 261120 // 255kB
     };
 
     /**
@@ -48,9 +49,11 @@ function FirePHP4Chrome_Options() {
      * Used to save options to local storage
      */
     var _save = function() {
-        var blacklist = document.querySelector('#blacklist').value;
+        var blacklist = document.querySelector('#blacklist').value,
+            max_combined_size = document.querySelector('#max_combined_size').value;
         var options = {
-            blacklist: blacklist
+            blacklist: blacklist,
+            maxCombinedSize: max_combined_size
         };
 
         chrome.storage.sync.set({'options': options}, function () {
@@ -88,6 +91,7 @@ function FirePHP4Chrome_Options() {
                 settings.options = _defaultOptions;
             }
             document.querySelector('#blacklist').value = settings.options.blacklist;
+            document.querySelector('#max_combined_size').value = settings.options.maxCombinedSize;
         });
     };
 
