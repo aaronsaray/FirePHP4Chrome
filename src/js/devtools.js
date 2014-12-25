@@ -30,12 +30,16 @@ function FirePHP4Chrome() {
             var digitRegexReplace = /^\d*\|/;
         	for (var i = 0; i < sortedHeaders.length; i++) {
         		var currentHeader = sortedHeaders[i].replace(digitRegexReplace, '');
-        		var parts = currentHeader.split('|');
-        		headerValue += parts[0];
-        		if (parts[1] == '\\') {
-        			/** its multipart so get next part **/
-        			continue;
-        		}
+
+                // check to see if it ends with |\ or just (])|
+                var end = currentHeader.slice(-2);
+                var negate = (currentHeader.slice(-2) == '|\\') ? 2 : 1;
+
+                headerValue += currentHeader.substr(0, currentHeader.length - negate);
+                if (negate == 2) {
+                    continue;  // its multipart
+                }
+
         		var commandObject = _buildCommandObject(headerValue);
         		if (commandObject) {
         			_sendCommandObject(commandObject);

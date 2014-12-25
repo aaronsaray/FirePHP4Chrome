@@ -32,7 +32,8 @@ class Tests implements \Iterator
 		'Table',
 		'Trace',
 		'MultipleHeadersProperOrder',
-		'MultilineHeaderMessage'
+		'MultilineHeaderMessage',
+		'Issue20'
 	);
 
 	/**
@@ -175,6 +176,23 @@ class Tests implements \Iterator
 			$array["{$key} test string"] = md5(uniqid());
 		}
 		\FB::log($item);
+	}
+
+	/**
+	 * A specific message is not parsed properly
+	 * @see https://github.com/aaronsaray/FirePHP4Chrome/issues/20
+	 */
+	protected function _testIssue20()
+	{
+		\FB::log('test line 1');
+		\FB::log('test line 2');
+
+		/**
+		 * The header message pasted was: X-Wf-1-1-1-3:120|[{"Type":"INFO","File":"","Line":"","Label":"app"},"#^https?:\/\/(?<city>[^\\.]+)\\.___domain___\/(actions|afisha)\/?#"]|
+		 * Reverse engineered that regular expression (although I think the op is missing a period in their domain
+		 */
+		$regEx = "#^https?://(?<city>[^\.]+)\.___domain___/(actions|afisha)/?#";
+		\FB::log($regEx);
 	}
 
 	/**********************************************************
