@@ -23,7 +23,7 @@ var FirePHP4Chrome_NS = FirePHP4Chrome_NS || {};
 FirePHP4Chrome_NS.addHeaders = true;
 
 /**
- * Max combined header size
+ * Max combined header size of 256kb
  */
 FirePHP4Chrome_NS.maxCombinedSize = 261120;
 
@@ -40,7 +40,7 @@ chrome.storage.sync.get('options', function(settings) {
                 }, {urls: blacklist}, ['blocking']
             );
         }
-        if (settings.options.maxCombinedSize) {
+        if (settings.options.hasOwnProperty('maxCombinedSize')) {
             FirePHP4Chrome_NS.maxCombinedSize = settings.options.maxCombinedSize;
         }
     }
