@@ -1,0 +1,5 @@
+{
+  "require": {
+    "firephp/firephp-core": "dev-master"
+  }
+}

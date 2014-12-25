@@ -8,6 +8,9 @@
 
 namespace FirePHP4Chrome;
 
+
+require __DIR__ . '/vendor/autoload.php';
+
 /**
  * The Tests Class
  *
@@ -195,8 +198,6 @@ class Tests implements \Iterator
 		if (!method_exists($this, $methodName)) {
 			throw new \Exception("This class does not contain the method: [{$methodName}]");
 		}
-
-		require 'FirePHPCore/fb.php';
 
 		$this->$methodName();
 
