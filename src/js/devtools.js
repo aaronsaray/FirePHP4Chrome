@@ -66,7 +66,7 @@ function FirePHP4Chrome() {
     this.sendFirstLoadMessage = function() {
         var commandObject = {
             type: "info",
-            params: ["FirePHP4Chrome logging activated.  You may need to refresh this page."]
+            params: ["FirePHP4Chrome logging activated.  Please refresh page for all settings to take effect."]
         };
         _sendCommandObject(commandObject);
     };

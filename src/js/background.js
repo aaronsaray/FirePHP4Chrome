@@ -28,9 +28,29 @@ FirePHP4Chrome_NS.addHeaders = true;
 FirePHP4Chrome_NS.maxCombinedSize = 261120;
 
 /**
+ * Whether the plugin is enabled
+ */
+FirePHP4Chrome_NS.enabled = true;
+
+/**
+ * Function to show in the browser action and text whether this is enabled or not
+ */
+FirePHP4Chrome_NS.showExtensionEnabled = function()
+{
+    if (FirePHP4Chrome_NS.enabled) {
+        chrome.browserAction.setTitle({"title":"Disable FirePHP4Chrome"});
+        chrome.browserAction.setIcon({path:"images/icon_128.png"});
+    }
+    else {
+        chrome.browserAction.setTitle({"title":"Enable FirePHP4Chrome"});
+        chrome.browserAction.setIcon({path:"images/icon_greyscale_128.png"});
+    }
+};
+
+/**
  * get options, then add a listener once i've got them
  */
-chrome.storage.sync.get('options', function(settings) {
+chrome.storage.sync.get(['options', 'enabled'], function(settings) {
     if (settings.options) {
         if (settings.options.blacklist) {
             var blacklist = settings.options.blacklist.replace(/\s+/, '').split(',');
@@ -44,6 +64,10 @@ chrome.storage.sync.get('options', function(settings) {
             FirePHP4Chrome_NS.maxCombinedSize = settings.options.maxCombinedSize;
         }
     }
+    if (settings.hasOwnProperty('enabled')) {
+        FirePHP4Chrome_NS.enabled = settings.enabled;
+        FirePHP4Chrome_NS.showExtensionEnabled();
+    }
 });
 
 /**
@@ -52,7 +76,7 @@ chrome.storage.sync.get('options', function(settings) {
  */
 chrome.webRequest.onBeforeSendHeaders.addListener(
 	function(details) {
-        if (FirePHP4Chrome_NS.addHeaders) {
+        if (FirePHP4Chrome_NS.addHeaders && FirePHP4Chrome_NS.enabled) {
             for (var i = 0; i < details.requestHeaders.length; i++) {
                 if (details.requestHeaders[i].name == 'User-Agent') {
                     details.requestHeaders[i].value += ' FirePHP/4Chrome'; // required for old ZF and other libs (matches the regex)
@@ -94,3 +118,15 @@ chrome.extension.onMessage.addListener(
 		});
 	}	
 );
+
+
+
+/**
+ * Define the click handler for the badge to handle disable/enable
+ */
+chrome.browserAction.onClicked.addListener(function(tab){
+    FirePHP4Chrome_NS.enabled = !FirePHP4Chrome_NS.enabled;
+    chrome.storage.sync.set({'enabled': FirePHP4Chrome_NS.enabled}, function() {
+        FirePHP4Chrome_NS.showExtensionEnabled();
+    });
+});
