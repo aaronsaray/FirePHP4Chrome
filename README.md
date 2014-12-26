@@ -13,6 +13,7 @@ Sick of reading and just want to install this? Go get it from the Chrome Webstor
 #### 0.10
 Merged in PR to add setting for max header size to be sent dynamically (Thanks https://github.com/GodLesZ).
 Fixed issue where a logged command had a pipe in it - would cause json parse to fail.
+Added a browser action icon to enable/disable firePHP4Chrome dynamic like.
 Some performance increases.
 
 #### 0.9
