@@ -10,6 +10,9 @@ Sick of reading and just want to install this? Go get it from the Chrome Webstor
 
 # Changelog
 
+#### 0.11
+Fixed bug that even when it was disabled, if the Wildfire headers were sent, it would display them anyway.  Technically the WF should not be sent by the server because the plugin was not requesting them - but I've modified it not to display them anyway.
+
 #### 0.10
 Merged in PR to add setting for max header size to be sent dynamically (Thanks https://github.com/GodLesZ).
 Fixed issue where a logged command had a pipe in it - would cause json parse to fail.

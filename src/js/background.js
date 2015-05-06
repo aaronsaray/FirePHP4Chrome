@@ -101,9 +101,11 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 /**
  * Code used to inject inline.  into the current page to run
  */
-const LOGGER = function (json) {
-    var commandObject = JSON.parse(unescape(json));
-    console[commandObject.type].apply(console, commandObject.params);
+const LOGGER = function (json, enabled) {
+    if (enabled) {
+        var commandObject = JSON.parse(unescape(json));
+        console[commandObject.type].apply(console, commandObject.params);
+    }
 };
 
 /** 
@@ -114,7 +116,7 @@ chrome.extension.onMessage.addListener(
 	function(commandObject) {
 		//inject LOGGER code and pass argument of our escaped stringified object
 		chrome.tabs.executeScript(null, {
-			 code: "("+ LOGGER + ")('" + commandObject + "');"
+			 code: "("+ LOGGER + ")('" + commandObject + "', " + FirePHP4Chrome_NS.enabled + ");"
 		});
 	}	
 );
