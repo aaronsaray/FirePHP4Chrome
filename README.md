@@ -10,7 +10,12 @@ One last thing: you should know that the formatting options for Google Chrome De
 
 Sick of reading and just want to install this? Go get it from the Chrome Webstore: https://chrome.google.com/webstore/detail/firephp4chrome/gpgbmonepdpnacijbbdijfbecmgoojma
 
+**Please Note:** This extension and myself are not associated with or endorsed by Google in any way.
+
 # Changelog
+
+#### 0.12
+Updated logo and wording in response to a trademark notice from Google.
 
 #### 0.11
 Fixed bug that even when it was disabled, if the Wildfire headers were sent, it would display them anyway.  Technically the WF should not be sent by the server because the plugin was not requesting them - but I've modified it not to display them anyway.
