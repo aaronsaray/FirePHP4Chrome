@@ -29,22 +29,24 @@ function FirePHP4Chrome() {
         	var headerValue = '';
             var digitRegexReplace = /^\d*\|/;
         	for (var i = 0; i < sortedHeaders.length; i++) {
-        		var currentHeader = sortedHeaders[i].replace(digitRegexReplace, '');
+                if (sortedHeaders[i]) {
+                    var currentHeader = sortedHeaders[i].replace(digitRegexReplace, '');
 
-                // check to see if it ends with |\ or just (])|
-                var end = currentHeader.slice(-2);
-                var negate = (currentHeader.slice(-2) == '|\\') ? 2 : 1;
+                    // check to see if it ends with |\ or just (])|
+                    var end = currentHeader.slice(-2);
+                    var negate = (currentHeader.slice(-2) == '|\\') ? 2 : 1;
 
-                headerValue += currentHeader.substr(0, currentHeader.length - negate);
-                if (negate == 2) {
-                    continue;  // its multipart
+                    headerValue += currentHeader.substr(0, currentHeader.length - negate);
+                    if (negate == 2) {
+                        continue;  // its multipart
+                    }
+
+                    var commandObject = _buildCommandObject(headerValue);
+                    if (commandObject) {
+                        _sendCommandObject(commandObject);
+                    }
+                    headerValue = '';
                 }
-
-        		var commandObject = _buildCommandObject(headerValue);
-        		if (commandObject) {
-        			_sendCommandObject(commandObject);
-        		}
-        		headerValue = '';
         	}
 
 	        /** handle truncated message **/
