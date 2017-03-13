@@ -14,6 +14,9 @@ Sick of reading and just want to install this? Go get it from the Chrome Webstor
 
 # Changelog
 
+#### 0.13
+Fixed bug for missing index of headers.  (Thanks https://github.com/Basster).
+
 #### 0.12
 Updated logo and wording in response to a trademark notice from Google.
 
