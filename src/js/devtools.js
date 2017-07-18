@@ -208,7 +208,10 @@ function FirePHP4Chrome() {
 		            }
 	            }
 
-                params.push(message);
+                if (message !== null) {
+                    // message "should" be null for groups, but if it's not, add it as a param
+                    params.push(message);
+                }
                 commandObject = {
                     type: consoleGroupCommand,
                     params: params
