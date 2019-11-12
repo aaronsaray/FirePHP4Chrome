@@ -1,4 +1,6 @@
-# FirePHP4Chrome - FirePHP Extension for Google Chrome
+# FirePHP4Chrome - FirePHP Extension for Google Chrome [Archived]
+
+*This extension has been archived.  As per [my license](./LICENSE), you are welcome to use this and/or reupload it to Google under your own name should you wish.  Thanks to the thousands of developers who installed and supported this extension!*
 
 The Developer Tools for Google Chrome are pretty great - but something was missing: FirePHP.  Now, instead of shifting back and forth between Firefox and Chrome for FirePHP messages, you can stay in one place.  
 
